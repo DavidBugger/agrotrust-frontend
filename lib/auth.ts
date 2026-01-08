@@ -24,7 +24,12 @@ export const verifyOtp = async (phone: string, token: string) => {
     });
 
     if (data.session) {
-        localStorage.setItem('supabase-token', data.session.access_token);
+        // console.log(data.session.access_token);
+        const accessToken = data.session.access_token;
+        localStorage.setItem('supabase-token', accessToken);
+
+        // Set cookie for middleware
+        document.cookie = `auth-token=${accessToken}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Strict; Secure`;
     }
 
     return { data, error };
@@ -34,4 +39,5 @@ export const signOut = async () => {
     if (!supabase) return;
     await supabase.auth.signOut();
     localStorage.removeItem('supabase-token');
+    document.cookie = "auth-token=; path=/; max-age=0; SameSite=Strict; Secure";
 };
